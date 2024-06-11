@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "305690842251",
+    "firebase_url": "https://nextjs-course-project-35d38-default-rtdb.firebaseio.com",
+    "project_id": "nextjs-course-project-35d38",
+    "storage_bucket": "nextjs-course-project-35d38.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:305690842251:android:41a47abc5230928988308e",
+        "android_client_info": {
+          "package_name": "com.devtor.point2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "305690842251-9uti56qsrsjeth89ne8lprt7p5vm7b42.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfRWLtQrgcij-YsWQXm3es6FJXodPQyo4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "305690842251-9uti56qsrsjeth89ne8lprt7p5vm7b42.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
