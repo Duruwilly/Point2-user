@@ -21,12 +21,12 @@ import {
   setOrderResponse,
 } from "../../store/reducers/app-reducer";
 import OrderSummary from "./components/OrderSummary";
-import { RenderScreenWebView } from "./components/web-view";
+import { RenderScreenWebView } from "../SingleOrder/components/web-view";
 
 const CreateOrder = ({ route, navigation }: any) => {
   const insets = useSafeAreaInsets();
   const [delivery, setDelivery] = useState("STANDARD_DELIVERY");
-  const [whoPays, setWhoPays] = useState("sender");
+  const [payee, setPayee] = useState("SENDER");
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [loading, setLoading] = useState(false);
   const [orderSent, setOrderSent] = useState(false);
@@ -54,7 +54,7 @@ const CreateOrder = ({ route, navigation }: any) => {
   };
 
   const handleWhoPays = (item: string) => {
-    setWhoPays(item);
+    setPayee(item);
   };
 
   const getCharges = async () => {
@@ -103,7 +103,8 @@ const CreateOrder = ({ route, navigation }: any) => {
           ...route.params,
           delivery_type: delivery,
           payment_method: paymentMethod,
-          who_pays: whoPays,
+          payee: payee,
+          coupon: coupon,
           km: formattedDistance.toString(),
         };
         const response = await request("POST", {
@@ -219,25 +220,25 @@ const CreateOrder = ({ route, navigation }: any) => {
             {/* {paymentMethod === "transfer" && ( */}
             <View style={styles.WhotoPayContainer}>
               <TouchableOpacity
-                onPress={() => handleWhoPays("sender")}
+                onPress={() => handleWhoPays("SENDER")}
                 style={[styles.optionContainer, styles.marginBottom]}
               >
                 <View
                   style={[
                     styles.circle,
-                    whoPays === "sender" && styles.selectedCircle,
+                    payee === "SENDER" && styles.selectedCircle,
                   ]}
                 />
                 <Text style={styles.optionText}>Sender Pay</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => handleWhoPays("receiver")}
+                onPress={() => handleWhoPays("RECEIVER")}
                 style={styles.optionContainer}
               >
                 <View
                   style={[
                     styles.circle,
-                    whoPays === "receiver" && styles.selectedCircle,
+                    payee === "RECEIVER" && styles.selectedCircle,
                   ]}
                 />
                 <Text style={styles.optionText}>Receiver Pay</Text>
@@ -246,7 +247,7 @@ const CreateOrder = ({ route, navigation }: any) => {
             {/* )} */}
 
             {/* paymentMethod method */}
-            {whoPays === "sender" && (
+            {payee === "SENDER" && (
               <View
                 style={{
                   alignItems: "flex-start",

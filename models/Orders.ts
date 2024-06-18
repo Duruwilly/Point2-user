@@ -16,7 +16,8 @@ export interface Orders {
     created_at: Date,
     delivery_point_location: string,
     status: string,
-    id: string
+    id: string,
+    payee: string
 }
 
 export interface OrderResponse extends Orders {}

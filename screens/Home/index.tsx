@@ -41,7 +41,7 @@ const Home = ({ setInputModal, setTab, location, tab }: paramsType) => {
       <Layout>
         <Layout.ScrollView>
           {/* LOCATION */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => setInputModal(true)}
             style={styles.locationContaner}
           >
@@ -68,7 +68,7 @@ const Home = ({ setInputModal, setTab, location, tab }: paramsType) => {
                 {location === "" ? "Set Location" : location}
               </Text>
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           {/* Package tracker */}
           <TrackPackage />

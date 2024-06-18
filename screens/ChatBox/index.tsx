@@ -17,14 +17,17 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Verified from "../../assets/icon/verified.svg";
 import Phone from "../../assets/icon/phone3.svg";
-import Speaker from "../../assets/icon/speaker.svg";
-import { FontAwesome6 } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { ApiRequest } from "../../services/ApiNetwork";
 import User from "../../models/User";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import { setUserMessages } from "../../store/reducers/app-reducer";
+import {
+  clearUserMessages,
+  setUserMessages,
+} from "../../store/reducers/app-reducer";
+import Pusher from "pusher-js";
+import Echo from "laravel-echo";
 
 export interface userConnectedToOrder extends User {
   user_id: string;
@@ -32,6 +35,7 @@ export interface userConnectedToOrder extends User {
 
 const ChatBox = ({ route }: any) => {
   const { usersMessages } = useSelector((state: RootState) => state.appReducer);
+  const { auth_Id } = useSelector((state: RootState) => state.user);
   const [message, setMessage] = useState("");
   const [textInputMessage, setTextInputMessage] = useState("");
   const [textMessageDate, setTextMessageDate] = useState<Date | null>(null);
@@ -57,13 +61,17 @@ const ChatBox = ({ route }: any) => {
           url: `/messaging/get-user-connected-to-order?tracking_id=${route?.params?.trackingId}`,
           // payload: { tracking_id: route?.params?.trackingId },
         });
-        console.log("user-conected-to-order", response);
+        // console.log("user-conected-to-order", response);
 
         if (response.status === "success") {
           setUserConnectedToOrder(response.data.data);
         }
       } catch (error) {}
     })();
+
+    return () => {
+      dispatch(clearUserMessages());
+    };
   }, []);
 
   //   2 get messages between users
@@ -72,8 +80,8 @@ const ChatBox = ({ route }: any) => {
     try {
       const response = await request("GET", {
         url: `/messaging/get-messages?to_user_id=${userConnectedToOrder?.user_id}`,
-        ignoreError: true,
         // payload: { to_user_id: userConnectedToOrder?.user_id },
+        ignoreError: true,
       });
       // console.log("users-messages", response.data?.data);
 
@@ -83,8 +91,6 @@ const ChatBox = ({ route }: any) => {
     } catch (error) {}
   };
   // }, []);
-  const date = new Date();
-  // console.log(date.toLocaleDateString(), date.toLocaleTimeString());
 
   const sendMessage = async () => {
     if (message.length > 0) {
@@ -111,6 +117,32 @@ const ChatBox = ({ route }: any) => {
   useEffect(() => {
     getMessage();
   }, [userConnectedToOrder?.user_id]);
+
+  useEffect(() => {
+    const pusher = new Pusher("fbuopzuamzxyjydgetkb", {
+      cluster: "",
+    });
+
+    const echo = new Echo({
+      client: pusher,
+      broadcaster: "reverb",
+      key: "fbuopzuamzxyjydgetkb",
+      wsHost: "ws.point2.ng",
+      wsPort: 80,
+      wssPort: 80,
+      forceTLS: "https",
+      enabledTransports: ["ws", "wss"],
+    });
+
+    echo.channel("message").listen(`message_received${auth_Id}`, (e: any) => {
+      console.log("Event data:", e);
+      getMessage();
+    });
+
+    return () => {
+      echo.disconnect();
+    };
+  }, [auth_Id]);
 
   const messagess = [
     [
@@ -162,8 +194,8 @@ const ChatBox = ({ route }: any) => {
             <View style={styles.riderInfo}>
               <View style={styles.riderNameContainer}>
                 <Text style={styles.riderName}>
-                  {userConnectedToOrder?.first_name ?? "Opeyemi"}{" "}
-                  {userConnectedToOrder?.last_name ?? "Fashina"}
+                  {userConnectedToOrder?.first_name ?? ""}{" "}
+                  {userConnectedToOrder?.last_name ?? ""}
                 </Text>
                 <View style={styles.riderBadge}>
                   <Text style={styles.riderBadgeText}>Rider</Text>
@@ -186,7 +218,6 @@ const ChatBox = ({ route }: any) => {
         <KeyboardAvoidingView>
           <View style={styles.messagesContainer}>
             <FlatList
-            showsVerticalScrollIndicator={false}
               data={usersMessages}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => (
@@ -212,7 +243,7 @@ const ChatBox = ({ route }: any) => {
                 </View>
               )}
             />
-            {textInputMessage && (
+            {/* {textInputMessage && (
               <View
                 style={{
                   alignSelf: "flex-end",
@@ -234,26 +265,26 @@ const ChatBox = ({ route }: any) => {
                   style={styles.timestamp}
                 >{`${textMessageDate?.toLocaleDateString()} ${textMessageDate?.toLocaleTimeString()}`}</Text>
               </View>
-            )}
+            )} */}
           </View>
         </KeyboardAvoidingView>
         {/* </Layout.ScrollView> */}
-
-        {/* BOTTOM INPUT */}
-        <View style={styles.bottomInputContainer}>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Type Message"
-              placeholderTextColor="#1D2939"
-              onChangeText={handleInputChange}
-              value={message}
-              keyboardType="default"
-            />
-            {/* <TouchableOpacity style={styles.addButton}>
+      </Layout>
+      {/* BOTTOM INPUT */}
+      <View style={styles.bottomInputContainer}>
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={styles.textInput}
+            placeholder="Type Message"
+            placeholderTextColor="#1D2939"
+            onChangeText={handleInputChange}
+            value={message}
+            keyboardType="default"
+          />
+          {/* <TouchableOpacity style={styles.addButton}>
               <FontAwesome6 name="add" size={18} color="#EBF8FF" />
             </TouchableOpacity> */}
-            {/* <View style={styles.rightIconsContainer}>
+          {/* <View style={styles.rightIconsContainer}>
               <View style={styles.verticalSeparator}></View>
               {message ? (
                 <TouchableOpacity style={styles.sendButton}>
@@ -265,14 +296,13 @@ const ChatBox = ({ route }: any) => {
                 </TouchableOpacity>
               )}
             </View> */}
-            <View style={styles.rightIconsContainer}>
-              <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
-                <FontAwesome name="send" size={15} color="#EBF8FF" />
-              </TouchableOpacity>
-            </View>
+          <View style={styles.rightIconsContainer}>
+            <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+              <FontAwesome name="send" size={15} color="#EBF8FF" />
+            </TouchableOpacity>
           </View>
         </View>
-      </Layout>
+      </View>
     </SafeAreaView>
   );
 };
@@ -393,6 +423,7 @@ const styles = StyleSheet.create({
     // justifyContent: "flex-start",
     // width: "100%",
     marginTop: 6,
+    marginBottom: 180,
     paddingHorizontal: 20,
   },
   messageIncomingContainer: {

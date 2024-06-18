@@ -35,21 +35,21 @@ import BottomSheet from "../../components/Bottomsheet/Bottomsheet";
 import Verified from "../../assets/icon/verified.svg";
 import { colors } from "../../constants/colors";
 import { Orders } from "../../models/Orders";
-import { BASE_URL } from "../../constants/Base_urls";
-import { RenderScreenWebView } from "../CreateOrder/components/web-view";
+// import { BASE_URL } from "../../constants/Base_urls";
+// import { RenderScreenWebView } from "../SingleOrder/components/web-view";
 import { GOOGLE_PLACES_API_KEY } from "../../constants/app";
 
 const Tracking = ({ route }: any) => {
   const { request } = ApiRequest();
   const navigation: any = useNavigation();
   const [riderLocation, setRiderLocation] = useState<any>(null);
-  const { orders, orderResponse } = useSelector(
+  const { orders } = useSelector(
     (state: RootState) => state.appReducer
   );
   const trackingId = route?.params?.trackingId;
-  const webviewValues = { order_id: orderResponse.id, callback_url: BASE_URL };
+  // const webviewValues = { order_id: orderResponse.id, callback_url: BASE_URL };
   const insets = useSafeAreaInsets();
-  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  // const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [userConnectedToOrder, setUserConnectedToOrder] = useState(
     {} as userConnectedToOrder
   );
@@ -77,9 +77,9 @@ const Tracking = ({ route }: any) => {
     }
   };
 
-  const hanldePayment = (item: string) => {
-    setPaymentMethod(item);
-  };
+  // const hanldePayment = (item: string) => {
+  //   setPaymentMethod(item);
+  // };
 
   const apiKey = GOOGLE_PLACES_API_KEY;
 
@@ -196,29 +196,29 @@ const Tracking = ({ route }: any) => {
     })();
   }, []);
 
-  useEffect(() => {
-    if (paymentMethod === "card") {
-      (async () => {
-        try {
-          const response = await request("POST", {
-            url: "/user/orders/order-checkout",
-            payload: { ...webviewValues },
-          });
-          console.log("confirm-order", response);
+  // useEffect(() => {
+  //   if (paymentMethod === "card") {
+  //     (async () => {
+  //       try {
+  //         const response = await request("POST", {
+  //           url: "/user/orders/order-checkout",
+  //           payload: { ...webviewValues },
+  //         });
+  //         console.log("confirm-order", response);
 
-          if (response.status === "success") {
-            setWebViewUrl(response.data.data.authorization_url);
-            closeBottomSheet();
-          } else {
-          }
-        } catch (error) {
-          console.log("error getting webview", error);
-        }
-      })();
-    } else {
-      // handle method for transfer here
-    }
-  }, [paymentMethod]);
+  //         if (response.status === "success") {
+  //           setWebViewUrl(response.data.data.authorization_url);
+  //           closeBottomSheet();
+  //         } else {
+  //         }
+  //       } catch (error) {
+  //         console.log("error getting webview", error);
+  //       }
+  //     })();
+  //   } else {
+  //     // handle method for transfer here
+  //   }
+  // }, [paymentMethod]);
 
   if (
     !originLatitude ||
@@ -246,11 +246,11 @@ const Tracking = ({ route }: any) => {
 
   return (
     <View style={styles.container}>
-      {webViewUrl ? (
+      {/* {webViewUrl ? (
         <View style={{ paddingTop: insets.top }}>
           <RenderScreenWebView url={webViewUrl} goBack={webViewBack} />
         </View>
-      ) : (
+      ) : ( */}
         <>
           <MapView
             ref={mapRef}
@@ -331,7 +331,7 @@ const Tracking = ({ route }: any) => {
             <Ionicons name="arrow-back" size={24} color="white" />
           </Pressable>
         </>
-      )}
+      {/* )} */}
       {openBottomSheet && (
         <BottomSheet
           ref={bottomSheetRef}
@@ -374,7 +374,7 @@ const Tracking = ({ route }: any) => {
                 </View>
               </View>
             </View>
-            <View style={{ paddingHorizontal: 20 }}>
+            {/* <View style={{ paddingHorizontal: 20 }}>
               <View
                 style={{
                   alignItems: "flex-start",
@@ -417,9 +417,9 @@ const Tracking = ({ route }: any) => {
                   <Text style={styles.text}>Pay with Transfer</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </View> */}
             <View
-              style={{ flexDirection: "row", gap: 12, paddingHorizontal: 20 }}
+              style={{ flexDirection: "row", gap: 12, paddingHorizontal: 20, marginTop: 10 }}
             >
               <TouchableOpacity
                 onPress={async () =>

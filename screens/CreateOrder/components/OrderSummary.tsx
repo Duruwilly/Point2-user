@@ -7,6 +7,7 @@ import { colors } from "../../../constants/colors";
 import { ApiRequest } from "../../../services/ApiNetwork";
 import { BASE_URL } from "../../../constants/Base_urls";
 import { useNavigation } from "@react-navigation/native";
+import { numberFormat } from "utils/helpers";
 
 const OrderSummary = ({setWebViewUrl, webViewUrl}: {setWebViewUrl: Dispatch<SetStateAction<string>>, webViewUrl: string}) => {
   const { orderCharges, orderResponse } = useSelector((state: RootState) => state.appReducer);
@@ -69,21 +70,21 @@ const navigation: any = useNavigation()
         ))} */}
         <View style={styles.priceItem}>
           <Text style={styles.priceTitle}>Delivery fee</Text>
-          <Text style={styles.price}>N{orderCharges.delivery_fee}</Text>
+          <Text style={styles.price}>{numberFormat(Number(orderCharges.delivery_fee))}</Text>
         </View>
         <View style={styles.priceItem}>
           <Text style={styles.priceTitle}>VAT({orderCharges.vat_percentage}%)</Text>
-          <Text style={styles.price}>N{orderCharges.vat}</Text>
+          <Text style={styles.price}>{numberFormat(Number(orderCharges.vat))}</Text>
         </View>
         <View style={styles.priceItem}>
           <Text style={styles.priceTitle}>Discount</Text>
-          <Text style={styles.price}>N{orderCharges.discount}</Text>
+          <Text style={styles.price}>{numberFormat(Number(orderCharges.discount))}</Text>
         </View>
       </View>
 
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>TOTAL</Text>
-        <Text style={styles.totalAmount}>N{orderCharges?.amount_to_pay}</Text>
+        <Text style={styles.totalAmount}>{numberFormat(Number(orderCharges?.amount_to_pay))}</Text>
       </View>
 
       {/* Error Message */}

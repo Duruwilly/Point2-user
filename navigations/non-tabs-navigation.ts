@@ -1,6 +1,6 @@
 import CreateOrder from "../screens/CreateOrder/CreateOrder";
 import DeliveryLocation from "../screens/DeliveryLocation";
-import OrderDetails from "../screens/Activity/OrderDetails";
+import OrderDetails from "../screens/SingleOrder/OrderDetails";
 import PackageSent from "../screens/OrderFinalScreen";
 import PickupDetails from "../screens/PickupDetails/PickupDetails";
 import Tracking from "../screens/LiveTracking";

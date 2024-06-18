@@ -55,7 +55,7 @@ const DeliveryLocation = ({ navigation, route }: any) => {
     const combinedData = {
       ...pickupDetails,
       ...userInput,
-      delivery_point_name: destination?.formatted_address,
+      // delivery_point_name: destination?.formatted_address,
       delivery_point_location: destination?.formatted_address,
       delivery_point_location_coordinate: [
         destination?.geometry?.location?.lat,

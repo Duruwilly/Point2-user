@@ -301,6 +301,8 @@ const ListData = ({ item }: { item: Orders }) => {
               ? "In-Transit"
               : item?.status === "DELIVERED"
               ? "Delivered"
+              : item?.status === "ACCEPTED"
+              ? "Accepted"
               : item?.status === "CANCELLED" && "Cancelled"}
           </Text>
           <View style={styles.statusIcon}>

@@ -88,7 +88,8 @@ const OrdersList = ({ item }: { item: Orders }) => {
             <Text style={styles.trackingId}>
               Tracking ID: {item.tracking_id ?? "Unavailable"}
             </Text>
-            {item.status !== "DELIVERED" && (
+            
+            {item.status !== "DELIVERED" && item?.tracking_id && (
               <TouchableOpacity
                 onPress={() =>
                   copyToClipboard(item?.tracking_id ? item?.tracking_id : "")
