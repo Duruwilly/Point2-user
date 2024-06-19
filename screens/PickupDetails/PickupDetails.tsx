@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   SafeAreaView,
@@ -21,6 +21,9 @@ import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import CustomRadioButton from "../../components/RadioButton/RadioButton";
 import { Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import { GOOGLE_PLACES_API_KEY } from "constants/app";
+import { useGeoCodingLocation } from "services/geoCoding";
 
 type InputType = {
   customer_name: string;
@@ -30,17 +33,19 @@ type InputType = {
   package_name: string;
   package_category: string;
   landmark: string;
+  pickup_location_coordinate: number[];
 };
 
 const PickupDetails = () => {
   const insets = useSafeAreaInsets();
   const [show, setShow] = useState(false);
   const [countryCode, setCountryCode] = useState("" || "+234");
-  const { user } = useSelector((state: RootState) => state.user);
+  const { user, location } = useSelector((state: RootState) => state.user);
   const [origin, setOrigin] = useState<any>(null);
   const [selectedOption, setSelelctedOption] = useState("");
   const [bottomSheetInputToOpen, setBottomSheetInputToOpen] = useState("");
   const navigation: any = useNavigation();
+  const {getGeocodingData} = useGeoCodingLocation()
 
   const bottomSheetRef: any = useRef(null);
   const snapPoints = useMemo(() => ["25%", "70%"], []);
@@ -86,6 +91,7 @@ const PickupDetails = () => {
     customer_name: user?.first_name || "",
     customer_phone: user?.phone || "",
     pickup_location: "",
+    pickup_location_coordinate: [location?.latitude, location?.longitude],
     package_name: "",
     landmark: "",
     package_category: "",
@@ -95,6 +101,14 @@ const PickupDetails = () => {
     // console.log("ab", JSON.stringify(details, null, 2));
     // console.log("cd", details.formatted_address);
     setOrigin(details);
+    setUserInput({
+      ...userInput,
+      pickup_location: details?.formatted_address,
+      pickup_location_coordinate: [
+        details?.geometry?.location?.lat,
+        details?.geometry?.location?.lng,
+      ],
+    });
   };
 
   const options = [
@@ -123,17 +137,24 @@ const PickupDetails = () => {
   const handleSubmit = () => {
     const combinedData = {
       ...userInput,
-      pickup_location: origin?.formatted_address,
-      pickup_location_coordinate: [
-        origin?.geometry?.location?.lat,
-        origin?.geometry?.location?.lng,
-      ],
+      // pickup_location: origin?.formatted_address,
+      // pickup_location_coordinate: [
+      //   origin?.geometry?.location?.lat,
+      //   origin?.geometry?.location?.lng,
+      // ],
     };
     // console.log("item in pick up detail comp", combinedData);
-    
+
     navigation.navigate("create-order", { pickupDetails: combinedData });
     // console.log(combinedData);
   };
+
+  useEffect(() => {
+   (async () => {
+    let res = await getGeocodingData()
+    setUserInput({...userInput, pickup_location: res})
+   })()
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
@@ -200,7 +221,7 @@ const PickupDetails = () => {
                 state={(text: string) =>
                   setUserInput((state) => ({ ...state, customer_email: text }))
                 }
-                style={{ }}
+                style={{}}
                 keyboard="email-address"
               />
               {/* <View style={styles.countryCodeContainer}>
@@ -235,7 +256,9 @@ const PickupDetails = () => {
                 }}
               >
                 <Text style={{ color: "#667085", fontSize: 16 }}>
-                  {origin ? origin?.formatted_address : "Search"}
+                  {userInput?.pickup_location
+                    ? userInput?.pickup_location
+                    : "Search"}
                 </Text>
               </TouchableOpacity>
             </View>
