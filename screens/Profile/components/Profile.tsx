@@ -53,11 +53,11 @@ const Profile = ({
       name: "Edit Details",
       link: "login",
     },
-    {
-      id: 2,
-      icon: <Card />,
-      name: "Manage Cards",
-    },
+    // {
+    //   id: 2,
+    //   icon: <Card />,
+    //   name: "Manage Cards",
+    // },
     {
       id: 0,
       icon: <Warning />,

@@ -148,7 +148,7 @@ const CreateOrder = ({ route, navigation }: any) => {
                 }}
               >
                 <View style={styles.textContainer}>
-                  <Text style={styles.pickupText}>PICKUP</Text>
+                  <Text style={styles.pickupText}>Pickup Location</Text>
                   <Text style={styles.detailsText}>Enter Pickup Details</Text>
                 </View>
                 <MaterialIcons
