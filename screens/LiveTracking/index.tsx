@@ -97,13 +97,18 @@ const Tracking = ({ route }: any) => {
   // );
 
   // console.log(orderDetails, trackingId);
-
-  const originLatitude = orderDetails?.pickup_location_coordinate
-    ? orderDetails?.pickup_location_coordinate[0]
+  const originLatitude = riderLocation
+    ? riderLocation[0]
     : null;
-  const originLongitude = orderDetails?.pickup_location_coordinate
-    ? orderDetails?.pickup_location_coordinate[1]
+  const originLongitude = riderLocation
+    ? riderLocation[1]
     : null;
+  // const originLatitude = orderDetails?.pickup_location_coordinate
+  //   ? orderDetails?.pickup_location_coordinate[0]
+  //   : null;
+  // const originLongitude = orderDetails?.pickup_location_coordinate
+  //   ? orderDetails?.pickup_location_coordinate[1]
+  //   : null;
   const destinationLatitude = orderDetails?.delivery_point_location_coordinate
     ? orderDetails?.delivery_point_location_coordinate[0]
     : null;
@@ -125,7 +130,8 @@ const Tracking = ({ route }: any) => {
       originLatitude &&
       originLongitude &&
       destinationLatitude &&
-      destinationLongitude
+      destinationLongitude &&
+      riderLocation
     ) {
       setOrigin({ latitude: originLatitude, longitude: originLongitude });
       setDestination({
@@ -138,25 +144,27 @@ const Tracking = ({ route }: any) => {
     originLongitude,
     destinationLatitude,
     destinationLongitude,
+    riderLocation
   ]);
 
   // USING POLLING TO GET THE RIDER'S LOCATION
   const fetchRiderLocation = async () => {
     const resp = await request("GET", {
-      url: `/location/${trackingId}`,
+      url: `/user/orders/track`,
+      payload: {tracking_id: trackingId},
       ignoreError: true
     });
     console.log("riders-location", resp);
 
     if (resp.status === "success") {
-      setRiderLocation(resp.data);
+      setRiderLocation(resp.data?.data?.rider_current_position);
     }
   };
 
-  // useEffect(() => {
-  //   const interval = setInterval(fetchRiderLocation, 5000); // Poll every 5 seconds
-  //   return () => clearInterval(interval);
-  // }, []);
+  useEffect(() => {
+    const interval = setInterval(fetchRiderLocation, 20000); // Poll every 3 minutes
+    return () => clearInterval(interval);
+  }, []);
 
   // USING SOCKET
   // useEffect(() => {
@@ -224,8 +232,8 @@ const Tracking = ({ route }: any) => {
     !originLatitude ||
     !originLongitude ||
     !destinationLatitude ||
-    !destinationLongitude
-    // !riderLocation
+    !destinationLongitude ||
+    !riderLocation
   ) {
     return (
       <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
