@@ -21,7 +21,6 @@ import {
   setOrderResponse,
 } from "../../store/reducers/app-reducer";
 import OrderSummary from "./components/OrderSummary";
-import { RenderScreenWebView } from "../SingleOrder/components/web-view";
 
 const CreateOrder = ({ route, navigation }: any) => {
   const insets = useSafeAreaInsets();
@@ -38,8 +37,8 @@ const CreateOrder = ({ route, navigation }: any) => {
   const pickupDetails = route?.params?.pickupDetails;
   // console.log("item in create order comp 1", pickupDetails);
   // console.log("item in create order comp 2", route?.params);
-  
-// console.log(route?.params);
+
+  // console.log(route?.params);
 
   const hanldeDelivery = (item: string) => {
     setDelivery(item);
@@ -72,7 +71,6 @@ const CreateOrder = ({ route, navigation }: any) => {
         url: "/user/orders/get-charges",
         payload: { km: formattedDistance.toString(), coupon },
       });
-      console.log("get-charges", response);
 
       if (response.status === "success") {
         setCharges(true);
@@ -87,7 +85,7 @@ const CreateOrder = ({ route, navigation }: any) => {
       if (!route.params.hasOwnProperty("delivery_point_location")) {
         alert("Please fill the delivery details section");
         setLoading(false);
-      } else if(!route.params.hasOwnProperty("pickup_location")) {
+      } else if (!route.params.hasOwnProperty("pickup_location")) {
         alert("Kindly fill the pickup details section");
       } else {
         const distanceS = getDistanceFromLatLonInKm(
@@ -111,8 +109,6 @@ const CreateOrder = ({ route, navigation }: any) => {
           url: "/user/orders/create",
           payload: combinedData,
         });
-
-        console.log("create-order", response);
 
         if (response.status === "success") {
           alert(response?.data?.message);
@@ -144,11 +140,39 @@ const CreateOrder = ({ route, navigation }: any) => {
               onPress={() => navigation.navigate("pick-up-details")}
               style={styles.touchableOpacity}
             >
-              <View style={styles.textContainer}>
-                <Text style={styles.pickupText}>PICKUP</Text>
-                <Text style={styles.detailsText}>Enter Pickup Details</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <View style={styles.textContainer}>
+                  <Text style={styles.pickupText}>PICKUP</Text>
+                  <Text style={styles.detailsText}>Enter Pickup Details</Text>
+                </View>
+                <MaterialIcons
+                  name="arrow-forward-ios"
+                  size={14}
+                  color="black"
+                />
               </View>
-              <MaterialIcons name="arrow-forward-ios" size={14} color="black" />
+              {route?.params?.pickupDetails?.hasOwnProperty("pickup_location") || route?.params?.hasOwnProperty("pickup_location")  && (
+                 <View
+                 style={{
+                   backgroundColor: colors.secondary,
+                   paddingVertical: 5,
+                   paddingHorizontal: 10,
+                   position: "absolute",
+                   right: 0,
+                   top: 0,
+                 }}
+               >
+                 <Text style={{ color: colors.primary, fontWeight: "600" }}>
+                   filled
+                 </Text>
+               </View>
+              )}
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() =>
@@ -158,11 +182,39 @@ const CreateOrder = ({ route, navigation }: any) => {
               }
               style={styles.touchableOpacity}
             >
-              <View style={styles.textContainer}>
-                <Text style={styles.pickupText}>Delivery Location</Text>
-                <Text style={styles.detailsText}>Enter Delivery Details</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <View style={styles.textContainer}>
+                  <Text style={styles.pickupText}>Delivery Location</Text>
+                  <Text style={styles.detailsText}>Enter Delivery Details</Text>
+                </View>
+                <MaterialIcons
+                  name="arrow-forward-ios"
+                  size={14}
+                  color="black"
+                />
               </View>
-              <MaterialIcons name="arrow-forward-ios" size={14} color="black" />
+              {route?.params?.hasOwnProperty("delivery_point_location") && (
+                 <View
+                 style={{
+                   backgroundColor: colors.secondary,
+                   paddingVertical: 5,
+                   paddingHorizontal: 10,
+                   position: "absolute",
+                   right: 0,
+                   top: 0,
+                 }}
+               >
+                 <Text style={{ color: colors.primary, fontWeight: "600" }}>
+                   filled
+                 </Text>
+               </View>
+              )}
             </TouchableOpacity>
             <View
               style={{
@@ -351,9 +403,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   touchableOpacity: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    position: "relative",
+    // flexDirection: "row",
+    // alignItems: "center",
+    // justifyContent: "space-between",
     width: "100%",
     borderRadius: 8,
     backgroundColor: "#F9FAFB",

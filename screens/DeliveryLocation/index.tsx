@@ -77,7 +77,7 @@ const DeliveryLocation = ({ navigation, route }: any) => {
           <KeyboardAvoidingView>
             <View style={{ position: "relative" }}>
               <View style={styles.labelContainer}>
-                <Text style={styles.labelContent}>Receiver's name</Text>
+                <Text style={styles.labelContent}>Receiver's Name</Text>
                 <Text style={{ color: colors.primary }}>*</Text>
               </View>
               <Input
@@ -154,7 +154,7 @@ const DeliveryLocation = ({ navigation, route }: any) => {
 
             <View style={{ marginTop: 12 }}>
               <View style={styles.labelContainer}>
-                <Text style={styles.labelContent}>Receiver's address</Text>
+                <Text style={styles.labelContent}>Receiver's Address</Text>
                 <Text style={{ color: colors.primary }}>*</Text>
               </View>
               <TouchableOpacity

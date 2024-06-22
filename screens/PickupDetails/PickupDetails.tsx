@@ -167,7 +167,7 @@ const PickupDetails = () => {
           <KeyboardAvoidingView>
             <View style={{ position: "relative" }}>
               <View style={styles.labelContainer}>
-                <Text style={styles.labelContent}>Customer name</Text>
+                <Text style={styles.labelContent}>Customer Name</Text>
                 <Text style={{ color: colors.primary }}>*</Text>
               </View>
               <Input
@@ -181,7 +181,7 @@ const PickupDetails = () => {
 
             <View style={{ position: "relative", marginTop: 20 }}>
               <View style={styles.labelContainer}>
-                <Text style={styles.labelContent}>Phone number</Text>
+                <Text style={styles.labelContent}>Phone Number</Text>
                 <Text style={{ color: colors.primary }}>*</Text>
               </View>
               <Input
@@ -242,7 +242,7 @@ const PickupDetails = () => {
             </View> */}
             <View style={{ marginTop: 12 }}>
               <View style={styles.labelContainer}>
-                <Text style={styles.labelContent}>Pickup address</Text>
+                <Text style={styles.labelContent}>Pickup Address</Text>
                 <Text style={{ color: colors.primary }}>*</Text>
               </View>
               <TouchableOpacity
