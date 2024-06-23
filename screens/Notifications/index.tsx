@@ -17,6 +17,9 @@ import { useIsFocused, useNavigation } from "@react-navigation/native";
 // import Picked from "../../assets/icon/picked.svg";
 // import Completed from "../../assets/icon/complete.svg";
 import { ApiRequest } from "../../services/ApiNetwork";
+import { RootState } from "store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { setNotifications } from "store/reducers/app-reducer";
 
 export type NotificationsType = {
   id: number;
@@ -52,11 +55,13 @@ type Pages = {
 const NotificationsPage = () => {
   const insets = useSafeAreaInsets();
   const { request } = ApiRequest();
-  const [notifications, setNotifications] = useState({} as Pages);
+  const { notifications} = useSelector((state: RootState) => state.appReducer);
+  // const [notifications, setNotifications] = useState({} as Pages);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [loading, setLoading] = useState({ state: false, page: 1, more: true });
+  const dispatch = useDispatch()
 
-  const navigation: any = useNavigation();
+  // const navigation: any = useNavigation();
   const isFocused = useIsFocused();
 
   const getNotifications = async (page: number) => {
@@ -66,7 +71,7 @@ const NotificationsPage = () => {
       const response = await request("GET", { url: "/notifications" });
 
       if (response.status === "success") {
-        setNotifications(response.data.data);
+        dispatch(setNotifications(response.data.data));
         setRefreshing(false);
         setLoading({
           page,

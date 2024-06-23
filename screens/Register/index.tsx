@@ -77,7 +77,7 @@ const Register = () => {
 
         if (response.status === "success") {
           await AsyncStorage.setItem(
-            "access_token",
+            "users_access_token",
             response.data.data.access_token
           );
           dispatch(setAccessToken(response?.data?.data?.access_token));

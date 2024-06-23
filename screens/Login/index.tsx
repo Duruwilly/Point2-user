@@ -55,11 +55,10 @@ const Login = () => {
           url: "/auth/login",
           payload: { ...userInput, device_token: expoPushtoken },
         });
-        console.log(response);
 
         if (response.status === "success") {
           await AsyncStorage.setItem(
-            "access_token",
+            "users_access_token",
             response.data.data.access_token
           );
           dispatch(setAccessToken(response?.data?.data.access_token));
@@ -79,7 +78,7 @@ const Login = () => {
         }
       }
     } catch (error) {
-      await AsyncStorage.removeItem("access_token");
+      await AsyncStorage.removeItem("users_access_token");
       console.error("API Error:", error);
       setLoading(false);
     } finally {

@@ -294,7 +294,7 @@ const PickupDetails = () => {
                 <Text style={styles.labelContent}>Item Name</Text>
               </View>
               <Input
-                placeholder="Enter b/stop (optional)"
+                placeholder="Item Name"
                 value={userInput.package_name}
                 state={(text: string) =>
                   setUserInput((state) => ({ ...state, package_name: text }))

@@ -55,7 +55,11 @@ const PackageSent = () => {
           },
         ]}
       />
-      <View style={styles.innerCircle}></View>
+      <View style={styles.innerCircle}>
+        <Text style={[styles.text, styles.dot]}>.</Text>
+        <Text style={[styles.text, styles.number]}>2</Text>
+      </View>
+      {/* <View style={styles.innerCircle}></View> */}
       <View style={styles.textContainer}>
         <Text style={styles.successText}>Rider on it's way</Text>
         <Text style={{ color: "#475467", fontSize: 15, fontWeight: "500", textAlign: "center", marginTop: 5 }}>
@@ -119,6 +123,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+  },
+  text: {
+    color: 'white',
+    fontSize: 24,
+  },
+  dot: {
+    marginBottom: 3,
+  },
+  number: {
+    fontWeight: 'bold',
   },
   textContainer: {
     width: "80%",

@@ -72,6 +72,7 @@ export default function Index() {
     if (accessTokenIsSet) {
       const response = await request("GET", {
         url: "/profile/details",
+        ignoreError: true
       });
       // console.log("user", response);
 
@@ -92,6 +93,7 @@ export default function Index() {
     if (fetchedUser) {
       const response = await request("GET", {
         url: `/user/orders/getorders`,
+        ignoreError: true
       });
 
       if (response.status === "success") {
@@ -149,7 +151,7 @@ export default function Index() {
   }, [fetchedUser, retry]);
 
   useEffect(() => {
-    AsyncStorage.getItem("access_token").then((data: any) => {
+    AsyncStorage.getItem("users_access_token").then((data: any) => {
       dispatch(setAccessToken(data ?? ""));
       setAccessTokenIsSet(true);
     });

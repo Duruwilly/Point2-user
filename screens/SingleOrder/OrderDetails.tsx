@@ -39,7 +39,6 @@ const OrderDetails = ({ route, navigation }: any) => {
         url: "/user/orders/order-checkout",
         payload: { ...values },
       });
-      console.log("confirm-order", response);
 
       if (response.status === "success") {
         setWebViewUrl(response.data.data.authorization_url);
@@ -47,7 +46,6 @@ const OrderDetails = ({ route, navigation }: any) => {
       }
     } catch (error) {}
   };
-  console.log(data);
 
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>

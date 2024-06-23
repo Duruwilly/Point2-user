@@ -147,7 +147,6 @@ const Tracking = ({ route }: any) => {
     riderLocation
   ]);
 
-  // USING POLLING TO GET THE RIDER'S LOCATION
   const fetchRiderLocation = async () => {
     const resp = await request("GET", {
       url: `/user/orders/track`,
@@ -162,7 +161,7 @@ const Tracking = ({ route }: any) => {
   };
 
   useEffect(() => {
-    const interval = setInterval(fetchRiderLocation, 20000); // Poll every 3 minutes
+    const interval = setInterval(fetchRiderLocation, 20000);
     return () => clearInterval(interval);
   }, []);
 

@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   SafeAreaView,
@@ -124,6 +124,13 @@ const CreateOrder = ({ route, navigation }: any) => {
     }
   };
 
+useEffect(() => {
+  if(route?.params?.hasOwnProperty("isReturn")) {
+    setCharges(false)
+    setOrderSent(false)
+  }
+}, [route?.params])
+
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
       {/* {webViewUrl ? (
@@ -138,7 +145,7 @@ const CreateOrder = ({ route, navigation }: any) => {
           <KeyboardAvoidingView>
             <TouchableOpacity
               onPress={() => navigation.navigate("pick-up-details")}
-              style={styles.touchableOpacity}
+              style={[styles.touchableOpacity, {borderWidth:1, borderColor: (route?.params?.pickupDetails?.hasOwnProperty("pickup_location") || route?.params?.hasOwnProperty("pickup_location")) ? "green": "white"}]}
             >
               <View
                 style={{
@@ -157,7 +164,7 @@ const CreateOrder = ({ route, navigation }: any) => {
                   color="black"
                 />
               </View>
-              {route?.params?.pickupDetails?.hasOwnProperty("pickup_location") || route?.params?.hasOwnProperty("pickup_location")  && (
+              {/* {(route?.params?.pickupDetails?.hasOwnProperty("pickup_location") || route?.params?.hasOwnProperty("pickup_location"))  && (
                  <View
                  style={{
                    backgroundColor: colors.secondary,
@@ -172,7 +179,7 @@ const CreateOrder = ({ route, navigation }: any) => {
                    filled
                  </Text>
                </View>
-              )}
+              )} */}
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() =>
@@ -180,7 +187,7 @@ const CreateOrder = ({ route, navigation }: any) => {
                   pickupDetails: pickupDetails,
                 })
               }
-              style={styles.touchableOpacity}
+              style={[styles.touchableOpacity, {borderWidth: 1, borderColor: route?.params?.hasOwnProperty("delivery_point_location") ? "green" : "white"}]}
             >
               <View
                 style={{
@@ -199,7 +206,7 @@ const CreateOrder = ({ route, navigation }: any) => {
                   color="black"
                 />
               </View>
-              {route?.params?.hasOwnProperty("delivery_point_location") && (
+              {/* {route?.params?.hasOwnProperty("delivery_point_location") && (
                  <View
                  style={{
                    backgroundColor: colors.secondary,
@@ -214,7 +221,7 @@ const CreateOrder = ({ route, navigation }: any) => {
                    filled
                  </Text>
                </View>
-              )}
+              )} */}
             </TouchableOpacity>
             <View
               style={{
@@ -382,7 +389,7 @@ const CreateOrder = ({ route, navigation }: any) => {
               Order Summary
             </Button>
 
-            {charges && (
+            {(charges || route?.params?.isReturn === false) && (
               <OrderSummary
                 setWebViewUrl={setWebViewUrl}
                 webViewUrl={webViewUrl}

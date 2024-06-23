@@ -14,8 +14,6 @@ import SendPackage from "./components/SendPackage";
 import RecentOrders from "./components/RecentOrder";
 import { useFetchOrders } from "../../services/fetchOrders";
 import { useIsFocused } from "@react-navigation/native";
-import { useSelector } from "react-redux";
-import { RootState } from "store/store";
 
 type paramsType = {
   setInputModal: Dispatch<SetStateAction<boolean>>;
@@ -25,7 +23,6 @@ type paramsType = {
 };
 
 const Home = ({ setInputModal, setTab, location, tab }: paramsType) => {
-  // const { location } = useSelector((state: RootState) => state.user);
   const insets = useSafeAreaInsets();
   const { fetchOrders } = useFetchOrders();
   const isFocused = useIsFocused();

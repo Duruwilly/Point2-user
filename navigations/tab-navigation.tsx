@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -19,7 +19,7 @@ import ProfileIcon from "../assets/icon/profile.svg";
 import ProfileIcon2 from "../assets/icon/profile2.svg";
 import { Ionicons, AntDesign, Fontisto } from "@expo/vector-icons";
 import CloseModal from "../components/bottom-modal/CloseModal";
-import NotificationsPage from "../screens/Notifications";
+import NotificationsPage, { NotificationsType } from "../screens/Notifications";
 import Activity from "../screens/Activity";
 import { useNavigation } from "@react-navigation/native";
 import ProfilePage from "../screens/Profile";
@@ -34,7 +34,7 @@ export function Tab() {
   const handleTab = (active: string) => {
     setTab(active);
   };
-
+  
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#EBF8FF" barStyle="dark-content" />
@@ -334,5 +334,14 @@ const styles = StyleSheet.create({
     marginTop: 3,
     color: "#475467",
     fontFamily: "regular",
+  },
+  redDot: {
+    position: 'absolute',
+    top: -4,
+    right: 30,
+    height: 8,
+    width: 8,
+    borderRadius: 4,
+    backgroundColor: 'red',
   },
 });

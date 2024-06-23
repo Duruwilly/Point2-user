@@ -3,6 +3,7 @@ import { AppState } from "../../models/App";
 import { Orders } from "../../models/Orders";
 import Charges from "../../models/Charges";
 import { UserMessages } from "../../models/Message";
+import { IntNotificationPages } from "models/Notification";
 
 const initialState: AppState = {
   orders: [],
@@ -12,6 +13,7 @@ const initialState: AppState = {
   messages: [],
   orderCharges: {} as Charges,
   orderResponse: {} as any,
+  notifications: {} as IntNotificationPages
 };
 
 const AppReducer = createSlice({
@@ -35,6 +37,9 @@ const AppReducer = createSlice({
     },
     setUserOrders: (state, action: PayloadAction<Orders[]>) => {
       state.orders = action.payload;
+    },
+    setNotifications: (state, action: PayloadAction<IntNotificationPages>) => {
+      state.notifications = action.payload;
     },
     setUserMessages: (state, action: PayloadAction<UserMessages[]>) => {
       // state.usersMessages = [...state.usersMessages, ...action.payload];
@@ -70,5 +75,6 @@ export const {
   setOrderResponse,
   setUserMessages,
   clearUserMessages,
+  setNotifications
 } = AppReducer.actions;
 export default AppReducer.reducer;

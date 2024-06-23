@@ -3,6 +3,7 @@
 
 import Charges from "./Charges";
 import { UserMessages } from "./Message";
+import { IntNotificationPages } from "./Notification";
 import { OrderResponse, Orders } from "./Orders";
 
 export interface AppState {
@@ -13,4 +14,5 @@ export interface AppState {
   usersMessages: UserMessages[] ,
   orderCharges: Charges,
   orderResponse: OrderResponse,
+  notifications: IntNotificationPages
 }

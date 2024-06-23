@@ -99,7 +99,7 @@ const Profile = ({
   };
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("access_token");
+    await AsyncStorage.removeItem("users_access_token");
     dispatch(clearUser());
     dispatch(setIsAuthentication(false));
     navigation.navigate("welcome");
