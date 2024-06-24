@@ -43,16 +43,14 @@ const Tracking = ({ route }: any) => {
   const { request } = ApiRequest();
   const navigation: any = useNavigation();
   const [riderLocation, setRiderLocation] = useState<any>(null);
-  const { orders } = useSelector(
-    (state: RootState) => state.appReducer
-  );
+  const { orders } = useSelector((state: RootState) => state.appReducer);
   const trackingId = route?.params?.trackingId;
   // const webviewValues = { order_id: orderResponse.id, callback_url: BASE_URL };
   const insets = useSafeAreaInsets();
   // const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
-  const [userConnectedToOrder, setUserConnectedToOrder] = useState(
-    {} as userConnectedToOrder
-  );
+  // const [userConnectedToOrder, setUserConnectedToOrder] = useState(
+  //   {} as userConnectedToOrder
+  // );
   const [distance, setDistance] = useState(0);
   const [duration, setDuration] = useState(0);
   const mapRef = useRef<MapView>(null);
@@ -91,18 +89,14 @@ const Tracking = ({ route }: any) => {
     );
   }
   // console.log(orderDetails);
-  
+
   // const orderDetails = orders?.find(
   //   (item: Orders) => item?.tracking_id === trackingId
   // );
 
   // console.log(orderDetails, trackingId);
-  const originLatitude = riderLocation
-    ? riderLocation[0]
-    : null;
-  const originLongitude = riderLocation
-    ? riderLocation[1]
-    : null;
+  const originLatitude = riderLocation ? riderLocation[0] : null;
+  const originLongitude = riderLocation ? riderLocation[1] : null;
   // const originLatitude = orderDetails?.pickup_location_coordinate
   //   ? orderDetails?.pickup_location_coordinate[0]
   //   : null;
@@ -144,16 +138,16 @@ const Tracking = ({ route }: any) => {
     originLongitude,
     destinationLatitude,
     destinationLongitude,
-    riderLocation
+    riderLocation,
   ]);
 
   const fetchRiderLocation = async () => {
     const resp = await request("GET", {
-      url: `/user/orders/track`,
-      payload: {tracking_id: trackingId},
-      ignoreError: true
+      url: `/user/orders/track?tracking_id=${trackingId}`,
+      // payload: {tracking_id: trackingId},
+      ignoreError: true,
     });
-    console.log("riders-location", resp);
+    // console.log("riders-loc", resp?.data?.data);
 
     if (resp.status === "success") {
       setRiderLocation(resp.data?.data?.rider_current_position);
@@ -181,27 +175,27 @@ const Tracking = ({ route }: any) => {
   //   return () => ws.close();
   // }, []);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const response = await request("GET", {
-          url: `/messaging/get-user-connected-to-order?tracking_id=${trackingId}`,
-          // payload: { tracking_id: trackingId },
-          ignoreError: true,
-        });
-        // console.log("user-conected-to-order", response);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       const response = await request("GET", {
+  //         url: `/messaging/get-user-connected-to-order?tracking_id=${trackingId}`,
+  //         // payload: { tracking_id: trackingId },
+  //         ignoreError: true,
+  //       });
+  //       // console.log("user-conected-to-order", response);
 
-        if (response.status === "success") {
-          setUserConnectedToOrder(response.data.data);
-          setOpenBottomSheet(true);
-        } else {
-          // setOpenBottomSheet(true); // remove later
-        }
-      } catch (error) {
-        // setOpenBottomSheet(true); // remove later
-      }
-    })();
-  }, []);
+  //       if (response.status === "success") {
+  //         setUserConnectedToOrder(response.data.data);
+  //         setOpenBottomSheet(true);
+  //       } else {
+  //         // setOpenBottomSheet(true); // remove later
+  //       }
+  //     } catch (error) {
+  //       // setOpenBottomSheet(true); // remove later
+  //     }
+  //   })();
+  // }, []);
 
   // useEffect(() => {
   //   if (paymentMethod === "card") {
@@ -227,12 +221,27 @@ const Tracking = ({ route }: any) => {
   //   }
   // }, [paymentMethod]);
 
+  if (!riderLocation) {
+    return (
+      <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
+        <Layout.Header />
+        <Layout>
+          <Layout.Body>
+            <View style={[styles.container, { marginTop: 50 }]}>
+              <Text style={styles.errorText}>Fetching rider's location...</Text>
+            </View>
+          </Layout.Body>
+        </Layout>
+      </SafeAreaView>
+    );
+  }
+
   if (
     !originLatitude ||
     !originLongitude ||
     !destinationLatitude ||
-    !destinationLongitude ||
-    !riderLocation
+    !destinationLongitude
+    // !riderLocation
   ) {
     return (
       <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
@@ -242,7 +251,7 @@ const Tracking = ({ route }: any) => {
             <View style={[styles.container, { marginTop: 50 }]}>
               <Text style={styles.errorText}>
                 No Location data available yet. You can check back later when
-                you get a tracking Id.
+                your order is in transit.
               </Text>
             </View>
           </Layout.Body>
@@ -258,223 +267,228 @@ const Tracking = ({ route }: any) => {
           <RenderScreenWebView url={webViewUrl} goBack={webViewBack} />
         </View>
       ) : ( */}
-        <>
-          <MapView
-            ref={mapRef}
-            style={[styles.map]}
-            region={{
-              latitude: (origin?.latitude + destination?.latitude) / 2,
-              longitude: (origin?.longitude + destination?.longitude) / 2,
-              // latitude: (riderLocation?.latitude + destination?.latitude) / 2,
-              // longitude:
-              //   (riderLocation?.longitude + destination?.longitude) / 2,
-              latitudeDelta:
-                Math.abs(origin?.latitude - destination?.latitude) * 2,
-                // Math.abs(riderLocation?.latitude - destination?.latitude) * 2,
-              longitudeDelta:
-                Math.abs(origin?.longitude - destination?.longitude) * 2,
-                // Math.abs(riderLocation?.longitude - destination?.longitude) * 2,
-            }}
-            loadingIndicatorColor="#e21d1d"
-            provider={
-              Platform.OS === "android" ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
-            }
-            scrollEnabled={true}
-            rotateEnabled={true}
-            showsUserLocation={true}
-            loadingEnabled={true}
-            pitchEnabled={true}
-            showsIndoorLevelPicker={true}
-            onMapReady={onMapLayout}
-          >
-            <Marker coordinate={origin}>
-              <MaterialCommunityIcons
-                name="motorbike"
-                size={24}
-                color="black"
-              />
-            </Marker>
-            {origin && <Marker coordinate={origin} />}
-            {destination && <Marker coordinate={destination} />}
-            {isMapReady && origin && destination && (
-              <MapViewDirections
-                origin={origin}
-                destination={destination}
-                apikey={apiKey}
-                strokeColor={colors.primary}
-                strokeWidth={4}
-                onReady={(args) => {                  
-                  setDistance(Number(args?.distance));
-                  setDuration(args?.duration);
-                }}
-                mode="DRIVING"
-              />
-            )}
-            <View
-              style={{
-                padding: 16,
-                position: "absolute",
-                top: 150,
-                right: 10,
+      <>
+        <MapView
+          ref={mapRef}
+          style={[styles.map]}
+          region={{
+            latitude: (origin?.latitude + destination?.latitude) / 2,
+            longitude: (origin?.longitude + destination?.longitude) / 2,
+            // latitude: (riderLocation?.latitude + destination?.latitude) / 2,
+            // longitude:
+            //   (riderLocation?.longitude + destination?.longitude) / 2,
+            latitudeDelta:
+              Math.abs(origin?.latitude - destination?.latitude) * 2,
+            // Math.abs(riderLocation?.latitude - destination?.latitude) * 2,
+            longitudeDelta:
+              Math.abs(origin?.longitude - destination?.longitude) * 2,
+            // Math.abs(riderLocation?.longitude - destination?.longitude) * 2,
+          }}
+          loadingIndicatorColor="#e21d1d"
+          provider={
+            Platform.OS === "android" ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
+          }
+          scrollEnabled={true}
+          rotateEnabled={true}
+          showsUserLocation={true}
+          loadingEnabled={true}
+          pitchEnabled={true}
+          showsIndoorLevelPicker={true}
+          onMapReady={onMapLayout}
+        >
+          <Marker coordinate={origin}>
+            <MaterialCommunityIcons name="motorbike" size={24} color="black" />
+          </Marker>
+          {origin && <Marker coordinate={origin} />}
+          {destination && <Marker coordinate={destination} />}
+          {isMapReady && origin && destination && (
+            <MapViewDirections
+              origin={origin}
+              destination={destination}
+              apikey={apiKey}
+              strokeColor={colors.primary}
+              strokeWidth={4}
+              onReady={(args) => {
+                setDistance(Number(args?.distance));
+                setDuration(args?.duration);
               }}
-            >
-            </View>
-          </MapView>
-              {distance && duration ? (
-                <View style={{position: "absolute", right: 30,
-                top: 100,}}>
-                  <Text style={{ fontWeight: "800", color: "red" }}>
-                    Distance: {distance?.toFixed(2)}
-                  </Text>
-                  <Text style={{ fontWeight: "800", color: "red" }}>
-                    Duration: {Math.ceil(duration)} min
-                  </Text>
-                </View>
-              ) : null}
-          <Pressable
-            onPress={() => navigation.goBack()}
-            style={[styles.backButton]}
-          >
-            <Ionicons name="arrow-back" size={24} color="white" />
-          </Pressable>
-        </>
+              mode="DRIVING"
+            />
+          )}
+          <View
+            style={{
+              padding: 16,
+              position: "absolute",
+              top: 150,
+              right: 10,
+            }}
+          ></View>
+        </MapView>
+        {distance && duration ? (
+          <View style={{ position: "absolute", right: 30, top: 100 }}>
+            <Text style={{ fontWeight: "800", color: "red" }}>
+              Distance: {distance?.toFixed(2)}
+            </Text>
+            <Text style={{ fontWeight: "800", color: "red" }}>
+              Duration:{" "}
+              {duration >= 60
+                ? `${Math.floor(duration / 60)} hr ${Math.ceil(
+                    duration % 60
+                  )} min`
+                : `${Math.ceil(duration)} min`}
+            </Text>
+          </View>
+        ) : null}
+        <Pressable
+          onPress={() => navigation.goBack()}
+          style={[styles.backButton]}
+        >
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </Pressable>
+      </>
       {/* )} */}
       {openBottomSheet && (
-        <BottomSheet
-          ref={bottomSheetRef}
-          index={1}
-          snapPoints={snapPoints}
-          style={{ padding: 0 }}
-          onChange={(index) => {
-            if (index === -1 || index === 0) {
-              closeBottomSheet();
-            }
-          }}
-        >
-          <View style={{ marginTop: 20, flex: 1 }}>
-            <View style={styles.header}>
-              <View style={styles.headerLeft}>
-                <View style={styles.riderImageContainer}>
-                  <Image
-                    style={styles.riderImage}
-                    source={
-                      userConnectedToOrder?.profile_picture
-                        ? { uri: userConnectedToOrder?.profile_picture }
-                        : require("../../assets/images/rider.jpg")
-                    }
-                    alt="Rider"
-                  />
-                  <View style={styles.verifiedIcon}>
-                    <Verified />
-                  </View>
-                </View>
-                <View style={styles.riderInfo}>
-                  <View style={styles.riderNameContainer}>
-                    <Text style={styles.riderName}>
-                      {userConnectedToOrder?.first_name ?? ""}{" "}
-                      {userConnectedToOrder?.last_name ?? ""}
-                    </Text>
-                    <View style={styles.riderBadge}>
-                      <Text style={styles.riderBadgeText}>Rider</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </View>
-            {/* <View style={{ paddingHorizontal: 20 }}>
-              <View
-                style={{
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  marginTop: 10,
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => hanldePayment("card")}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    marginBottom: 15,
-                  }}
-                >
-                  <View
-                    style={[
-                      styles.circle,
-                      paymentMethod === "card" && styles.selectedCircle,
-                    ]}
-                  />
-                  <Text style={styles.text}>Pay with Card</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => hanldePayment("transfer")}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    marginBottom: 20,
-                  }}
-                >
-                  <View
-                    style={[
-                      styles.circle,
-                      paymentMethod === "transfer" && styles.selectedCircle,
-                    ]}
-                  />
-                  <Text style={styles.text}>Pay with Transfer</Text>
-                </TouchableOpacity>
-              </View>
-            </View> */}
-            <View
-              style={{ flexDirection: "row", gap: 12, paddingHorizontal: 20, marginTop: 10 }}
-            >
-              <TouchableOpacity
-                onPress={async () =>
-                  await Linking.openURL(`tel:${userConnectedToOrder?.phone}`)
-                }
-                style={[
-                  {
-                    flex: 1,
-                    backgroundColor: "#27AE60",
-                    paddingVertical: 10,
-                    borderRadius: 10,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 7,
-                    justifyContent: "center",
-                  },
-                ]}
-              >
-                <Feather name="phone" size={20} color="white" />
-                <Text style={{ color: "white" }}>Call</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("chat-box", { trackingId: trackingId })
-                }
-                style={[
-                  {
-                    flex: 1,
-                    backgroundColor: colors.secondary,
-                    paddingVertical: 10,
-                    borderRadius: 10,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 7,
-                    justifyContent: "center",
-                  },
-                ]}
-              >
-                <Ionicons
-                  name="chatbubbles-outline"
-                  size={24}
-                  color={colors.primary}
-                />
-                <Text style={{ color: colors.primary }}>Chat</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </BottomSheet>
+        // <BottomSheet
+        //   ref={bottomSheetRef}
+        //   index={1}
+        //   snapPoints={snapPoints}
+        //   style={{ padding: 0 }}
+        //   onChange={(index) => {
+        //     if (index === -1 || index === 0) {
+        //       closeBottomSheet();
+        //     }
+        //   }}
+        // >
+        //   <View style={{ marginTop: 20, flex: 1 }}>
+        //     <View style={styles.header}>
+        //       <View style={styles.headerLeft}>
+        //         <View style={styles.riderImageContainer}>
+        //           <Image
+        //             style={styles.riderImage}
+        //             source={
+        //               userConnectedToOrder?.profile_picture
+        //                 ? { uri: userConnectedToOrder?.profile_picture }
+        //                 : require("../../assets/images/rider.jpg")
+        //             }
+        //             alt="Rider"
+        //           />
+        //           <View style={styles.verifiedIcon}>
+        //             <Verified />
+        //           </View>
+        //         </View>
+        //         <View style={styles.riderInfo}>
+        //           <View style={styles.riderNameContainer}>
+        //             <Text style={styles.riderName}>
+        //               {userConnectedToOrder?.first_name ?? ""}{" "}
+        //               {userConnectedToOrder?.last_name ?? ""}
+        //             </Text>
+        //             <View style={styles.riderBadge}>
+        //               <Text style={styles.riderBadgeText}>Rider</Text>
+        //             </View>
+        //           </View>
+        //         </View>
+        //       </View>
+        //     </View>
+        //     {/* <View style={{ paddingHorizontal: 20 }}>
+        //       <View
+        //         style={{
+        //           alignItems: "flex-start",
+        //           justifyContent: "flex-start",
+        //           marginTop: 10,
+        //         }}
+        //       >
+        //         <TouchableOpacity
+        //           onPress={() => hanldePayment("card")}
+        //           style={{
+        //             flexDirection: "row",
+        //             alignItems: "center",
+        //             justifyContent: "flex-start",
+        //             marginBottom: 15,
+        //           }}
+        //         >
+        //           <View
+        //             style={[
+        //               styles.circle,
+        //               paymentMethod === "card" && styles.selectedCircle,
+        //             ]}
+        //           />
+        //           <Text style={styles.text}>Pay with Card</Text>
+        //         </TouchableOpacity>
+        //         <TouchableOpacity
+        //           onPress={() => hanldePayment("transfer")}
+        //           style={{
+        //             flexDirection: "row",
+        //             alignItems: "center",
+        //             justifyContent: "flex-start",
+        //             marginBottom: 20,
+        //           }}
+        //         >
+        //           <View
+        //             style={[
+        //               styles.circle,
+        //               paymentMethod === "transfer" && styles.selectedCircle,
+        //             ]}
+        //           />
+        //           <Text style={styles.text}>Pay with Transfer</Text>
+        //         </TouchableOpacity>
+        //       </View>
+        //     </View> */}
+        //     <View
+        //       style={{
+        //         flexDirection: "row",
+        //         gap: 12,
+        //         paddingHorizontal: 20,
+        //         marginTop: 10,
+        //       }}
+        //     >
+        //       <TouchableOpacity
+        //         onPress={async () =>
+        //           await Linking.openURL(`tel:${userConnectedToOrder?.phone}`)
+        //         }
+        //         style={[
+        //           {
+        //             flex: 1,
+        //             backgroundColor: "#27AE60",
+        //             paddingVertical: 10,
+        //             borderRadius: 10,
+        //             flexDirection: "row",
+        //             alignItems: "center",
+        //             gap: 7,
+        //             justifyContent: "center",
+        //           },
+        //         ]}
+        //       >
+        //         <Feather name="phone" size={20} color="white" />
+        //         <Text style={{ color: "white" }}>Call</Text>
+        //       </TouchableOpacity>
+        //       <TouchableOpacity
+        //         onPress={() =>
+        //           navigation.navigate("chat-box", { trackingId: trackingId })
+        //         }
+        //         style={[
+        //           {
+        //             flex: 1,
+        //             backgroundColor: colors.secondary,
+        //             paddingVertical: 10,
+        //             borderRadius: 10,
+        //             flexDirection: "row",
+        //             alignItems: "center",
+        //             gap: 7,
+        //             justifyContent: "center",
+        //           },
+        //         ]}
+        //       >
+        //         <Ionicons
+        //           name="chatbubbles-outline"
+        //           size={24}
+        //           color={colors.primary}
+        //         />
+        //         <Text style={{ color: colors.primary }}>Chat</Text>
+        //       </TouchableOpacity>
+        //     </View>
+        //   </View>
+        // </BottomSheet>
+        <></>
       )}
     </View>
   );

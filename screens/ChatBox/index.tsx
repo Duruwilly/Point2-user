@@ -144,31 +144,6 @@ const ChatBox = ({ route }: any) => {
     };
   }, [auth_Id]);
 
-  const messagess = [
-    [
-      {
-        id: 1,
-        message:
-          "Hello this is a sent message hdllo lorem s bvjhvj hgvhv hvhu hvuh ",
-        type: "sent",
-        date_sent: "2024/05/24 10:48:42",
-      },
-      {
-        id: 2,
-        message:
-          "Hello this is a received message hguyg jjhgj gu hvuvu hvhuv hgvhgv",
-        type: "received",
-        date_sent: "2024/05/24 10:48:50",
-      },
-      {
-        id: 3,
-        message: "Hello this is a sent message",
-        type: "sent",
-        date_sent: "2024/05/24 10:48:53",
-      },
-    ],
-  ];
-
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
       <Layout>
@@ -423,7 +398,7 @@ const styles = StyleSheet.create({
     // justifyContent: "flex-start",
     // width: "100%",
     marginTop: 6,
-    marginBottom: 180,
+    paddingBottom: 180,
     paddingHorizontal: 20,
   },
   messageIncomingContainer: {

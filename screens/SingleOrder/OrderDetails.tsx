@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  Linking,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -18,10 +19,14 @@ import { Button } from "react-native-paper";
 import { BASE_URL } from "constants/Base_urls";
 import { ApiRequest } from "services/ApiNetwork";
 import { RenderScreenWebView } from "./components/web-view";
+import { userConnectedToOrder } from "screens/ChatBox";
 
 const OrderDetails = ({ route, navigation }: any) => {
   const data = route?.params?.data;
   const insets = useSafeAreaInsets();
+  const [userConnectedToOrder, setUserConnectedToOrder] = useState(
+    {} as userConnectedToOrder
+  );
   const [loading, setLoading] = useState(false);
   const [webViewUrl, setWebViewUrl] = useState("");
   const { request } = ApiRequest();
@@ -46,6 +51,24 @@ const OrderDetails = ({ route, navigation }: any) => {
       }
     } catch (error) {}
   };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await request("GET", {
+          url: `/messaging/get-user-connected-to-order?tracking_id=${data?.tracking_id}`,
+          // payload: { tracking_id: trackingId },
+          ignoreError: true,
+        });
+        // console.log("user-conected-to-order", response);
+
+        if (response.status === "success") {
+          setUserConnectedToOrder(response.data.data);
+        } else {
+        }
+      } catch (error) {}
+    })();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
@@ -82,6 +105,13 @@ const OrderDetails = ({ route, navigation }: any) => {
               <View style={styles.detailColumn}>
                 <Text style={styles.detailLabel}>Recipient Name</Text>
                 <Text style={styles.detailValue}>{data?.recepient_name}</Text>
+              </View>
+              <View style={[styles.detailColumn, {marginTop: 20}]}>
+                <Text style={styles.detailLabel}>Rider's Name</Text>
+                <Text style={styles.detailValue}>
+                  {userConnectedToOrder?.first_name ?? ""}{" "}
+                  {userConnectedToOrder?.last_name ?? ""}
+                </Text>
               </View>
               {/* <View style={[styles.detailColumn, styles.detailColumnSpacing]}>
               <Text style={styles.detailLabel}>Package Weight</Text>
@@ -228,9 +258,65 @@ const OrderDetails = ({ route, navigation }: any) => {
             <View
               style={{
                 flexDirection: "row",
+                gap: 12,
+                paddingHorizontal: 20,
+                marginTop: 40,
+              }}
+            >
+              <TouchableOpacity
+                onPress={async () =>
+                  await Linking.openURL(`tel:${userConnectedToOrder?.phone}`)
+                }
+                style={[
+                  {
+                    flex: 1,
+                    backgroundColor: "#27AE60",
+                    paddingVertical: 10,
+                    borderRadius: 10,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 7,
+                    justifyContent: "center",
+                  },
+                ]}
+              >
+                <Feather name="phone" size={20} color="white" />
+                <Text style={{ color: "white" }}>Call</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("chat-box", {
+                    trackingId: data?.tracking_id,
+                  })
+                }
+                style={[
+                  {
+                    flex: 1,
+                    backgroundColor: colors.secondary,
+                    paddingVertical: 10,
+                    borderRadius: 10,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 7,
+                    justifyContent: "center",
+                  },
+                ]}
+              >
+                <Ionicons
+                  name="chatbubbles-outline"
+                  size={24}
+                  color={colors.primary}
+                />
+                <Text style={{ color: colors.primary }}>Chat</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
                 justifyContent: "space-between",
                 width: "100%",
-                marginTop: 40,
+                // marginTop: 40,
               }}
             >
               {data?.status !== "DELIVERED" && (
@@ -313,10 +399,11 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   productDetailsContainer: {
-    flexDirection: "row",
+    // flexDirection: "row",
     alignItems: "flex-start",
     width: "100%",
-    marginTop: 32,
+    // marginTop: 32,
+    marginTop: 10
   },
   detailColumn: {
     alignItems: "flex-start",
