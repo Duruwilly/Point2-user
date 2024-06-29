@@ -78,8 +78,8 @@ const NotificationsPage = () => {
         setLoading({
           page,
           state: false,
-          // more: res?.data?.length === res?.meta.per_page,
-          more: false
+          more: res?.data?.length === res?.meta.per_page,
+          // more: false
         });
         dispatch(setNotifications({page, notification: res}));
         // if (page === 1) {
@@ -150,7 +150,7 @@ const NotificationsPage = () => {
   const getMore = () => {
     if (notifications?.links?.next != null) {
       setLoading({ ...loading, state: true });
-      // getNotifications(loading.page + 1);
+      getNotifications(loading.page + 1);
     }
   };
 
