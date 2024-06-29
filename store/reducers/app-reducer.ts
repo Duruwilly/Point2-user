@@ -13,7 +13,7 @@ const initialState: AppState = {
   messages: [],
   orderCharges: {} as Charges,
   orderResponse: {} as any,
-  notifications: {} as IntNotificationPages
+  notifications: {} as IntNotificationPages,
 };
 
 const AppReducer = createSlice({
@@ -38,12 +38,35 @@ const AppReducer = createSlice({
     setUserOrders: (state, action: PayloadAction<Orders[]>) => {
       state.orders = action.payload;
     },
-    setNotifications: (state, action: PayloadAction<IntNotificationPages>) => {
-      state.notifications = action.payload;
+    setNotifications: (state, action: PayloadAction<{page: Number, notification: IntNotificationPages}>) => {
+      if(action.payload.page === 1) {
+        state.notifications = action.payload.notification;
+      } else {
+        state.notifications = {
+          ...state.notifications,
+          data: [...state.notifications.data, ...action.payload.notification.data],
+          links: action.payload.notification.links,
+          meta: action.payload.notification.meta,
+        };
+      }
+      // state.notifications = action.payload;
     },
+
+    appendNotifications: (
+      state,
+      action: PayloadAction<IntNotificationPages>
+    ) => {
+      state.notifications = {
+        ...state.notifications,
+        data: [...state.notifications.data, ...action.payload.data],
+        links: action.payload.links,
+        meta: action.payload.meta,
+      };
+    },
+
     setUserMessages: (state, action: PayloadAction<UserMessages[]>) => {
       // state.usersMessages = [...state.usersMessages, ...action.payload];
-      state.usersMessages = action.payload
+      state.usersMessages = action.payload;
     },
     // setUserMessages: (state, action: PayloadAction<UserMessages[]>) => {
     //   const newMessages = action.payload.filter(
@@ -75,6 +98,7 @@ export const {
   setOrderResponse,
   setUserMessages,
   clearUserMessages,
-  setNotifications
+  setNotifications,
+  appendNotifications,
 } = AppReducer.actions;
 export default AppReducer.reducer;

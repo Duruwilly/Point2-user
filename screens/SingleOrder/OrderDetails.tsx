@@ -106,7 +106,7 @@ const OrderDetails = ({ route, navigation }: any) => {
                 <Text style={styles.detailLabel}>Recipient Name</Text>
                 <Text style={styles.detailValue}>{data?.recepient_name}</Text>
               </View>
-              <View style={[styles.detailColumn, {marginTop: 20}]}>
+              <View style={[styles.detailColumn, { marginTop: 20 }]}>
                 <Text style={styles.detailLabel}>Rider's Name</Text>
                 <Text style={styles.detailValue}>
                   {userConnectedToOrder?.first_name ?? ""}{" "}
@@ -255,68 +255,71 @@ const OrderDetails = ({ route, navigation }: any) => {
               </View>
             )}
             {/* BUTTON */}
-            <View
-              style={{
-                flexDirection: "row",
-                gap: 12,
-                paddingHorizontal: 20,
-                marginTop: 40,
-              }}
-            >
-              <TouchableOpacity
-                onPress={async () =>
-                  await Linking.openURL(`tel:${userConnectedToOrder?.phone}`)
-                }
-                style={[
-                  {
-                    flex: 1,
-                    backgroundColor: "#27AE60",
-                    paddingVertical: 10,
-                    borderRadius: 10,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 7,
-                    justifyContent: "center",
-                  },
-                ]}
+            {data?.tracking_id && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 12,
+                  paddingHorizontal: 20,
+                  marginTop: 40,
+                }}
               >
-                <Feather name="phone" size={20} color="white" />
-                <Text style={{ color: "white" }}>Call</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("chat-box", {
-                    trackingId: data?.tracking_id,
-                  })
-                }
-                style={[
-                  {
-                    flex: 1,
-                    backgroundColor: colors.secondary,
-                    paddingVertical: 10,
-                    borderRadius: 10,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 7,
-                    justifyContent: "center",
-                  },
-                ]}
-              >
-                <Ionicons
-                  name="chatbubbles-outline"
-                  size={24}
-                  color={colors.primary}
-                />
-                <Text style={{ color: colors.primary }}>Chat</Text>
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity
+                  onPress={async () =>
+                    await Linking.openURL(
+                      `tel:${`+234${userConnectedToOrder?.phone}`}`
+                    )
+                  }
+                  style={[
+                    {
+                      flex: 1,
+                      backgroundColor: "#27AE60",
+                      paddingVertical: 10,
+                      borderRadius: 10,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 7,
+                      justifyContent: "center",
+                    },
+                  ]}
+                >
+                  <Feather name="phone" size={20} color="white" />
+                  <Text style={{ color: "white" }}>Call</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("chat-box", {
+                      trackingId: data?.tracking_id,
+                    })
+                  }
+                  style={[
+                    {
+                      flex: 1,
+                      backgroundColor: colors.secondary,
+                      paddingVertical: 10,
+                      borderRadius: 10,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 7,
+                      justifyContent: "center",
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name="chatbubbles-outline"
+                    size={24}
+                    color={colors.primary}
+                  />
+                  <Text style={{ color: colors.primary }}>Chat</Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "space-between",
-                width: "100%",
-                // marginTop: 40,
+                gap: 12,
+                // paddingHorizontal: 20,
               }}
             >
               {data?.status !== "DELIVERED" && (
@@ -326,7 +329,14 @@ const OrderDetails = ({ route, navigation }: any) => {
                       trackingId: data?.tracking_id,
                     })
                   }
-                  style={[styles.button, { backgroundColor: colors.primary }]}
+                  style={[
+                    {
+                      flex: 1,
+                      backgroundColor: colors.primary,
+                      paddingVertical: 14,
+                      borderRadius: 10,
+                    },
+                  ]}
                 >
                   <Text style={[styles.buttonText, { color: "white" }]}>
                     Live Tracking
@@ -336,7 +346,14 @@ const OrderDetails = ({ route, navigation }: any) => {
               {data?.status === "INTRANSIT" && data?.payee === "SENDER" && (
                 <TouchableOpacity
                   onPress={handleCheckout}
-                  style={[styles.button, { backgroundColor: colors.primary }]}
+                  style={[
+                    {
+                      flex: 1,
+                      backgroundColor: colors.primary,
+                      paddingVertical: 14,
+                      borderRadius: 10,
+                    },
+                  ]}
                 >
                   <Text style={[styles.buttonText, { color: "white" }]}>
                     Pay Now
@@ -403,7 +420,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     width: "100%",
     // marginTop: 32,
-    marginTop: 10
+    marginTop: 10,
   },
   detailColumn: {
     alignItems: "flex-start",
@@ -520,7 +537,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: 48,
-    width: "48%",
+    // width: "48%",
     borderRadius: 8,
     backgroundColor: "#0077B6",
   },
@@ -528,6 +545,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
     fontFamily: "bold",
+    textAlign: "center",
   },
 });
 

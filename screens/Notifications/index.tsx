@@ -19,7 +19,8 @@ import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { ApiRequest } from "../../services/ApiNetwork";
 import { RootState } from "store/store";
 import { useDispatch, useSelector } from "react-redux";
-import { setNotifications } from "store/reducers/app-reducer";
+import { appendNotifications, setNotifications } from "store/reducers/app-reducer";
+import { useFetchNotification } from "services/notificationSystem";
 
 export type NotificationsType = {
   id: number;
@@ -54,12 +55,12 @@ type Pages = {
 
 const NotificationsPage = () => {
   const insets = useSafeAreaInsets();
-  const { request } = ApiRequest();
-  const { notifications} = useSelector((state: RootState) => state.appReducer);
+  const { notifications } = useSelector((state: RootState) => state.appReducer);
+  const { fetchNotification } = useFetchNotification();
   // const [notifications, setNotifications] = useState({} as Pages);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [loading, setLoading] = useState({ state: false, page: 1, more: true });
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   // const navigation: any = useNavigation();
   const isFocused = useIsFocused();
@@ -68,30 +69,80 @@ const NotificationsPage = () => {
     setRefreshing(true);
     setLoading({ ...loading, state: true });
     try {
-      const response = await request("GET", { url: "/notifications" });
-
-      if (response.status === "success") {
-        dispatch(setNotifications(response.data.data));
+      const res = await fetchNotification(page);
+      console.log(page);
+      console.log(res.data.length, res.meta.per_page);
+      const newNotifications = res;
+      if (res) {
         setRefreshing(false);
         setLoading({
           page,
           state: false,
-          more: notifications.data.length < 10 ? false : true,
+          // more: res?.data?.length === res?.meta.per_page,
+          more: false
         });
+        dispatch(setNotifications({page, notification: res}));
+        // if (page === 1) {
+        //   dispatch(setNotifications(newNotifications));
+        // } else {
+        //   dispatch(appendNotifications(newNotifications));
+        // }
       } else {
         setLoading({ ...loading, state: false });
         setRefreshing(false);
       }
-    } catch (error) {
-      setRefreshing(false);
-      setLoading({ ...loading, state: false });
-    }
+    } catch (error) {}
+
+    // try {
+    //   const response = await request("GET", {
+    //     url: `/notifications?page=${page}`,
+    //   });
+
+    //   if (response.status === "success") {
+    //     const newNotifications = response.data.data;
+    //     console.log(newNotifications);
+
+    //     // setNotifications({...notifications, ...response?.data?.data})
+    // setRefreshing(false);
+    // setLoading({
+    //   page,
+    //   state: false,
+    //   more: newNotifications?.data?.length === newNotifications?.meta.per_page,
+    // });
+
+    //     // setNotifications((prevNotifications) => {
+    //     //   if (page === 1) {
+    //     //     // console.log("yes", response.data.data);
+    //     //     // return {}
+    //     //     return { ...response.data.data };
+    //     //   } else {
+    //     //     // console.log("no", response.data);
+
+    //     //     return {
+    //     //       ...response.data.data,
+    //     //       data: [...prevNotifications.data, ...newNotifications?.data],
+    //     //     };
+    //     //   }
+    //     // });
+    // if (page === 1) {
+    //   dispatch(setNotifications(newNotifications));
+    // } else {
+    //   dispatch(appendNotifications(newNotifications));
+    // }
+    //   } else {
+    // setLoading({ ...loading, state: false });
+    // setRefreshing(false);
+    //   }
+    // } catch (error) {
+    //   setRefreshing(false);
+    //   setLoading({ ...loading, state: false });
+    // }
   };
 
   const handleRefreshing = async () => {
     try {
       setRefreshing(true);
-      await getNotifications(loading?.page);
+      await getNotifications(1);
     } catch (error) {}
     setRefreshing(false);
   };
@@ -99,13 +150,13 @@ const NotificationsPage = () => {
   const getMore = () => {
     if (notifications?.links?.next != null) {
       setLoading({ ...loading, state: true });
-      getNotifications(loading.page + 1);
+      // getNotifications(loading.page + 1);
     }
   };
 
   useEffect(() => {
-    getNotifications(loading.page);
-  }, [isFocused]);
+    getNotifications(1);
+  }, [isFocused, dispatch]);
 
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
@@ -123,7 +174,7 @@ const NotificationsPage = () => {
           data={notifications.data}
           renderItem={({ item, index }) => {
             return (
-              <View style={styles.notificationContainer}>
+              <View key={index} style={styles.notificationContainer}>
                 <NotificationList item={item} />
               </View>
             );

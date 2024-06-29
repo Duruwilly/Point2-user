@@ -86,7 +86,6 @@ const Profile = ({
             "Content-Type": "multipart/form-data",
           },
         });
-        console.log(resp);
 
         if (resp.status === "success") {
           await fetchUser();
@@ -100,6 +99,7 @@ const Profile = ({
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem("users_access_token");
+    await AsyncStorage.removeItem("prev_selected_address");
     dispatch(clearUser());
     dispatch(setIsAuthentication(false));
     navigation.navigate("welcome");

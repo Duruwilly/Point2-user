@@ -147,7 +147,6 @@ const Tracking = ({ route }: any) => {
       // payload: {tracking_id: trackingId},
       ignoreError: true,
     });
-    // console.log("riders-loc", resp?.data?.data);
 
     if (resp.status === "success") {
       setRiderLocation(resp.data?.data?.rider_current_position);
@@ -221,27 +220,10 @@ const Tracking = ({ route }: any) => {
   //   }
   // }, [paymentMethod]);
 
-  if (!riderLocation) {
-    return (
-      <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
-        <Layout.Header />
-        <Layout>
-          <Layout.Body>
-            <View style={[styles.container, { marginTop: 50 }]}>
-              <Text style={styles.errorText}>Fetching rider's location...</Text>
-            </View>
-          </Layout.Body>
-        </Layout>
-      </SafeAreaView>
-    );
-  }
-
   if (
-    !originLatitude ||
-    !originLongitude ||
     !destinationLatitude ||
-    !destinationLongitude
-    // !riderLocation
+    !destinationLongitude &&
+    !orderDetails
   ) {
     return (
       <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
@@ -267,85 +249,104 @@ const Tracking = ({ route }: any) => {
           <RenderScreenWebView url={webViewUrl} goBack={webViewBack} />
         </View>
       ) : ( */}
-      <>
-        <MapView
-          ref={mapRef}
-          style={[styles.map]}
-          region={{
-            latitude: (origin?.latitude + destination?.latitude) / 2,
-            longitude: (origin?.longitude + destination?.longitude) / 2,
-            // latitude: (riderLocation?.latitude + destination?.latitude) / 2,
-            // longitude:
-            //   (riderLocation?.longitude + destination?.longitude) / 2,
-            latitudeDelta:
-              Math.abs(origin?.latitude - destination?.latitude) * 2,
-            // Math.abs(riderLocation?.latitude - destination?.latitude) * 2,
-            longitudeDelta:
-              Math.abs(origin?.longitude - destination?.longitude) * 2,
-            // Math.abs(riderLocation?.longitude - destination?.longitude) * 2,
-          }}
-          loadingIndicatorColor="#e21d1d"
-          provider={
-            Platform.OS === "android" ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
-          }
-          scrollEnabled={true}
-          rotateEnabled={true}
-          showsUserLocation={true}
-          loadingEnabled={true}
-          pitchEnabled={true}
-          showsIndoorLevelPicker={true}
-          onMapReady={onMapLayout}
-        >
-          <Marker coordinate={origin}>
-            <MaterialCommunityIcons name="motorbike" size={24} color="black" />
-          </Marker>
-          {origin && <Marker coordinate={origin} />}
-          {destination && <Marker coordinate={destination} />}
-          {isMapReady && origin && destination && (
-            <MapViewDirections
-              origin={origin}
-              destination={destination}
-              apikey={apiKey}
-              strokeColor={colors.primary}
-              strokeWidth={4}
-              onReady={(args) => {
-                setDistance(Number(args?.distance));
-                setDuration(args?.duration);
-              }}
-              mode="DRIVING"
-            />
-          )}
-          <View
-            style={{
-              padding: 16,
-              position: "absolute",
-              top: 150,
-              right: 10,
+      {!riderLocation ? (
+        <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
+          <Layout.Header />
+          <Layout>
+            <Layout.Body>
+              <View style={[styles.container, { marginTop: 50 }]}>
+                <Text style={styles.errorText}>
+                  Fetching rider's location...
+                </Text>
+              </View>
+            </Layout.Body>
+          </Layout>
+        </SafeAreaView>
+      ) : (
+        <>
+          <MapView
+            ref={mapRef}
+            style={[styles.map]}
+            region={{
+              latitude: (origin?.latitude + destination?.latitude) / 2,
+              longitude: (origin?.longitude + destination?.longitude) / 2,
+              // latitude: (riderLocation?.latitude + destination?.latitude) / 2,
+              // longitude:
+              //   (riderLocation?.longitude + destination?.longitude) / 2,
+              latitudeDelta:
+                Math.abs(origin?.latitude - destination?.latitude) * 2,
+              // Math.abs(riderLocation?.latitude - destination?.latitude) * 2,
+              longitudeDelta:
+                Math.abs(origin?.longitude - destination?.longitude) * 2,
+              // Math.abs(riderLocation?.longitude - destination?.longitude) * 2,
             }}
-          ></View>
-        </MapView>
-        {distance && duration ? (
-          <View style={{ position: "absolute", right: 30, top: 100 }}>
-            <Text style={{ fontWeight: "800", color: "red" }}>
-              Distance: {distance?.toFixed(2)}
-            </Text>
-            <Text style={{ fontWeight: "800", color: "red" }}>
-              Duration:{" "}
-              {duration >= 60
-                ? `${Math.floor(duration / 60)} hr ${Math.ceil(
-                    duration % 60
-                  )} min`
-                : `${Math.ceil(duration)} min`}
-            </Text>
-          </View>
-        ) : null}
-        <Pressable
-          onPress={() => navigation.goBack()}
-          style={[styles.backButton]}
-        >
-          <Ionicons name="arrow-back" size={24} color="white" />
-        </Pressable>
-      </>
+            loadingIndicatorColor="#e21d1d"
+            provider={
+              Platform.OS === "android" ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
+            }
+            scrollEnabled={true}
+            rotateEnabled={true}
+            showsUserLocation={true}
+            loadingEnabled={true}
+            pitchEnabled={true}
+            showsIndoorLevelPicker={true}
+            onMapReady={onMapLayout}
+          >
+            <Marker coordinate={origin}>
+              <MaterialCommunityIcons
+                name="motorbike"
+                size={24}
+                color="black"
+              />
+            </Marker>
+            {origin && <Marker coordinate={origin} />}
+            {destination && <Marker coordinate={destination} />}
+            {isMapReady && origin && destination && (
+              <MapViewDirections
+                origin={origin}
+                destination={destination}
+                apikey={apiKey}
+                strokeColor={colors.primary}
+                strokeWidth={4}
+                onReady={(args) => {
+                  setDistance(Number(args?.distance));
+                  setDuration(args?.duration);
+                }}
+                mode="DRIVING"
+              />
+            )}
+            <View
+              style={{
+                padding: 16,
+                position: "absolute",
+                top: 150,
+                right: 10,
+              }}
+            ></View>
+          </MapView>
+          {distance && duration ? (
+            <View style={{ position: "absolute", right: 30, top: 100 }}>
+              <Text style={{ fontWeight: "800", color: "red" }}>
+                Distance: {distance?.toFixed(2)}
+              </Text>
+              <Text style={{ fontWeight: "800", color: "red" }}>
+                Duration:{" "}
+                {duration >= 60
+                  ? `${Math.floor(duration / 60)} hr ${Math.ceil(
+                      duration % 60
+                    )} min`
+                  : `${Math.ceil(duration)} min`}
+              </Text>
+            </View>
+          ) : null}
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={[styles.backButton]}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </Pressable>
+        </>
+      )}
       {/* )} */}
       {openBottomSheet && (
         // <BottomSheet

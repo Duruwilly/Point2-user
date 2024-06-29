@@ -19,21 +19,35 @@ import ProfileIcon from "../assets/icon/profile.svg";
 import ProfileIcon2 from "../assets/icon/profile2.svg";
 import { Ionicons, AntDesign, Fontisto } from "@expo/vector-icons";
 import CloseModal from "../components/bottom-modal/CloseModal";
-import NotificationsPage, { NotificationsType } from "../screens/Notifications";
+import NotificationsPage from "../screens/Notifications";
 import Activity from "../screens/Activity";
 import { useNavigation } from "@react-navigation/native";
 import ProfilePage from "../screens/Profile";
+import { useSelector } from "react-redux";
+import { RootState } from "store/store";
 
 export function Tab() {
+  const { notifications} = useSelector((state: RootState) => state.appReducer);
   const [tab, setTab] = useState("home");
   const [inputModal, setInputModal] = useState(false);
   const [deleteCard, setDeleteCard] = useState(false);
   const [location, setLocation] = useState("");
+  const [hasUnRead, setHasUnread] = useState(false)
   const navigation: any = useNavigation()
 
   const handleTab = (active: string) => {
     setTab(active);
   };
+
+  const checkUnreadNotifications = () => {
+    return notifications?.data?.some(notification => notification.status === "UNREAD");
+  };
+
+  useEffect(() => {
+    if(notifications?.data) {
+      setHasUnread(checkUnreadNotifications());
+    }
+  }, [notifications?.data]);
   
   return (
     <View style={styles.container}>
@@ -107,7 +121,7 @@ export function Tab() {
 
         <TouchableOpacity
           onPress={() => handleTab("notification")}
-          style={styles.tabButton}
+          style={[styles.tabButton, {position: "relative"}]}
         >
           {tab === "notification" ? (
             <NotificationIcon2 height={24} width={24} />
@@ -122,6 +136,7 @@ export function Tab() {
           >
             Notification
           </Text>
+          {hasUnRead && <View style={styles.redDot} />}
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -337,7 +352,7 @@ const styles = StyleSheet.create({
   },
   redDot: {
     position: 'absolute',
-    top: -4,
+    top: -2,
     right: 30,
     height: 8,
     width: 8,

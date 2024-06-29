@@ -40,3 +40,22 @@ export const numberFormat = (num: number) =>
   new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(
     Number(num)
   );
+
+  export function convertTo12HourFormat(timeString: any) {
+    // Split the input string by colon to get hours, minutes, and seconds
+    // console.log(timeString);
+    
+    let [hours, minutes] = timeString.split(':');
+    
+    // Convert hours to an integer
+    hours = parseInt(hours);
+
+    // Determine AM or PM suffix
+    let period = hours >= 12 ? 'PM' : 'AM';
+
+    // Convert hours to 12-hour format
+    hours = hours % 12 || 12; // Converts 0 to 12 for midnight (00:00:00)
+
+    // Return the formatted time string
+    return `${hours}:${minutes} ${period}`;
+}

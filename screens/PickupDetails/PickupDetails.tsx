@@ -22,8 +22,9 @@ import CustomRadioButton from "../../components/RadioButton/RadioButton";
 import { Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import { GOOGLE_PLACES_API_KEY } from "constants/app";
+// import { GOOGLE_PLACES_API_KEY } from "constants/app";
 import { useGeoCodingLocation } from "services/geoCoding";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type InputType = {
   customer_name: string;
@@ -44,8 +45,9 @@ const PickupDetails = () => {
   const [origin, setOrigin] = useState<any>(null);
   const [selectedOption, setSelelctedOption] = useState("");
   const [bottomSheetInputToOpen, setBottomSheetInputToOpen] = useState("");
+  const [storedLocation, setStoredLocation] = useState<string | null>(null);
   const navigation: any = useNavigation();
-  const {getGeocodingData} = useGeoCodingLocation()
+  const { getGeocodingData } = useGeoCodingLocation();
 
   const bottomSheetRef: any = useRef(null);
   const snapPoints = useMemo(() => ["25%", "70%"], []);
@@ -97,7 +99,7 @@ const PickupDetails = () => {
     package_category: "",
   } as InputType);
 
-  const handlePlaceSelection = (details: any) => {
+  const handlePlaceSelection = async (details: any) => {
     // console.log("ab", JSON.stringify(details, null, 2));
     // console.log("cd", details.formatted_address);
     setOrigin(details);
@@ -109,6 +111,10 @@ const PickupDetails = () => {
         details?.geometry?.location?.lng,
       ],
     });
+    await AsyncStorage.setItem(
+      "prev_selected_address",
+      details?.formatted_address
+    );
   };
 
   const options = [
@@ -149,11 +155,36 @@ const PickupDetails = () => {
     // console.log(combinedData);
   };
 
+  // useEffect(() => {
+  //   (async () => {
+  //     let res = await getGeocodingData();
+  //     setUserInput({ ...userInput, pickup_location: "24 ave, 2024 area" });
+  //   })();
+  // }, []);
+
   useEffect(() => {
-   (async () => {
-    let res = await getGeocodingData()
-    setUserInput({...userInput, pickup_location: res})
-   })()
+    const loadStoredLocation = async () => {
+      let storedLocation = await AsyncStorage.getItem('prev_selected_address');
+      if (storedLocation) {
+        setStoredLocation(storedLocation);
+        setUserInput((prev) => ({
+          ...prev,
+          pickup_location: storedLocation,
+        }));
+      } else {
+        let res = await getGeocodingData();
+        setUserInput((prev) => ({
+          ...prev,
+          pickup_location: res,
+        }));
+        await AsyncStorage.setItem(
+          "prev_selected_address",
+          res
+        );
+      }
+    };
+
+    loadStoredLocation();
   }, []);
 
   return (
@@ -244,6 +275,16 @@ const PickupDetails = () => {
               <View style={styles.labelContainer}>
                 <Text style={styles.labelContent}>Pickup Address</Text>
                 <Text style={{ color: colors.primary }}>*</Text>
+                <TouchableOpacity style={{marginLeft: 5}}>
+                  <Text
+                    style={{
+                      color: colors.primary,
+                      fontSize: 15,
+                    }}
+                  >
+                    use previous location?
+                  </Text>
+                </TouchableOpacity>
               </View>
               <TouchableOpacity
                 onPress={() => openBottomSheetFn("places-search")}

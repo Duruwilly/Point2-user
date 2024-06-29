@@ -28,6 +28,7 @@ import {
 } from "../../store/reducers/app-reducer";
 import Pusher from "pusher-js";
 import Echo from "laravel-echo";
+import { convertTo12HourFormat } from "utils/helpers";
 
 export interface userConnectedToOrder extends User {
   user_id: string;
@@ -158,7 +159,7 @@ const ChatBox = ({ route }: any) => {
                 source={
                   userConnectedToOrder?.profile_picture
                     ? { uri: userConnectedToOrder?.profile_picture }
-                    : require("../../assets/images/rider.jpg")
+                    : require("../../assets/images/no-img.png")
                 }
                 alt="Rider"
               />
@@ -181,7 +182,7 @@ const ChatBox = ({ route }: any) => {
           </View>
           <TouchableOpacity
             onPress={async () =>
-              await Linking.openURL(`tel:${userConnectedToOrder?.phone}`)
+              await Linking.openURL(`tel:${`+234${userConnectedToOrder?.phone}`}`)
             }
             style={styles.callButton}
           >
@@ -212,9 +213,11 @@ const ChatBox = ({ route }: any) => {
                       },
                     ]}
                   >
-                    <Text style={styles.messageText}>{item.message}</Text>
+                    <Text style={styles.messageText}>{item?.message}</Text>
                   </View>
-                  <Text style={styles.timestamp}>{item.date_sent}</Text>
+                  <Text style={[styles.timestamp, {  alignSelf:
+                      item?.type === "received" ? "flex-start" : "flex-end",
+                    justifyContent: "flex-start"}]}>{convertTo12HourFormat(item?.date_sent.split(" ")[1])}</Text>
                 </View>
               )}
             />

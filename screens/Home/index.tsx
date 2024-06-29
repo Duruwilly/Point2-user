@@ -2,18 +2,17 @@ import React, { Dispatch, SetStateAction, useEffect } from "react";
 import {
   SafeAreaView,
   StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
 } from "react-native";
 import Layout from "../../layouts/layout";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Location from "../../assets/icon/location.svg";
 import TrackPackage from "./components/PackageTracker";
 import SendPackage from "./components/SendPackage";
 import RecentOrders from "./components/RecentOrder";
 import { useFetchOrders } from "../../services/fetchOrders";
 import { useIsFocused } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { setNotifications } from "store/reducers/app-reducer";
+import { useFetchNotification } from "services/notificationSystem";
 
 type paramsType = {
   setInputModal: Dispatch<SetStateAction<boolean>>;
@@ -22,16 +21,25 @@ type paramsType = {
   tab: string;
 };
 
-const Home = ({ setInputModal, setTab, location, tab }: paramsType) => {
+const Home = ({ setInputModal, setTab, tab }: paramsType) => {
   const insets = useSafeAreaInsets();
   const { fetchOrders } = useFetchOrders();
+  const { fetchNotification } = useFetchNotification();
   const isFocused = useIsFocused();
-
+  const dispatch = useDispatch()
+  
   useEffect(() => {
     (async () => {
       await fetchOrders();
     })();
   }, [tab, isFocused]);
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetchNotification(1)
+      dispatch(setNotifications({page: 1, notification: res}));
+    })()
+  }, [tab, isFocused])
 
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
@@ -66,6 +74,14 @@ const Home = ({ setInputModal, setTab, location, tab }: paramsType) => {
               </Text>
             </View>
           </TouchableOpacity> */}
+          {/* Notification */}
+          {/* <TouchableOpacity
+            onPress={() => setTab("notification")}
+            style={styles.notificationContaner}
+          >
+            <NotificationIcon2 height={24} width={24} />
+            
+          </TouchableOpacity> */}
 
           {/* Package tracker */}
           <TrackPackage />
@@ -82,10 +98,11 @@ const Home = ({ setInputModal, setTab, location, tab }: paramsType) => {
 };
 
 const styles = StyleSheet.create({
-  locationContaner: {
+  notificationContaner: {
+    position: "relative",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "flex-end",
     width: "100%",
     gap: 6,
   },
@@ -102,6 +119,15 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     justifyContent: "center",
     marginLeft: 3,
+  },
+  redDot: {
+    position: "absolute",
+    top: -2,
+    right: 3,
+    height: 8,
+    width: 8,
+    borderRadius: 4,
+    backgroundColor: "red",
   },
 });
 export default Home;
